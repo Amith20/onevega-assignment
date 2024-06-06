@@ -1,95 +1,80 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
 
-export default function Home() {
-  return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+import React, { useEffect, useState } from "react";
+import {
+  Box,
+  Button,
+  ButtonGroup,
+  Container,
+  Grid,
+  Typography,
+} from "@mui/material";
+import Sidebar from "@/components/SideBar";
+import SearchBar from "@/components/SearchBar";
+import PromptCard from "@/components/PromptCard";
+import { getPrompts } from "@/lib/FetchData";
 
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  );
+interface Prompts {
+  name: string;
+  createdAt: string;
 }
+
+const Home = () => {
+  const [prompts, setPrompts] = useState<Prompts[]>([]);
+
+  useEffect(() => {
+    getPrompts().then((res): any => {
+      if (res && res.length > 0) {
+        setPrompts(res);
+      }
+    });
+  }, []);
+
+  return (
+    <Box display="flex">
+      <Sidebar />
+      <Box flexGrow={1} p={2} bgcolor="#8246A1">
+        <SearchBar />
+        <Container>
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            mb={2}
+          >
+            <Typography variant="h5" color="white">
+              BCF Board 1
+            </Typography>
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+              mb={2}
+              gap={6}
+              bgcolor="white"
+              paddingY={1.5}
+              paddingX={5}
+              borderRadius={3}
+            >
+              <Typography>Today</Typography>
+              <Typography>Week</Typography>
+              <Typography>Month</Typography>
+            </Box>
+          </Box>
+          <Grid container spacing={2}>
+            {prompts.map((prompt, index) => (
+              <Grid item md={2.4} key={index}>
+                <PromptCard
+                  title={prompt.name}
+                  date={new Date(prompt.createdAt).toDateString()}
+                />
+              </Grid>
+            ))}
+          </Grid>
+        </Container>
+      </Box>
+    </Box>
+  );
+};
+
+export default Home;
